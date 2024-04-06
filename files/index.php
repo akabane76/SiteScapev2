@@ -1,3 +1,6 @@
+<?php
+include ('res/dbcon.php');
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -16,14 +19,23 @@
                 <i class="bx bx-grid-alt"></i>
                 <span class="links_name">All Sites</span>
             </li>
-            <li class="">
-                <i class="bx bx-grid-alt"></i>
-                <span class="links_name">All Sites</span>
-            </li>
-            <li class="">
-                <i class="bx bx-grid-alt"></i>
-                <span class="links_name">All Sites</span>
-            </li>
+            <?php
+            $sql = "SELECT DISTINCT category_name, category_id 
+            FROM categories 
+            WHERE category_name != 'Hidden Site';";
+            $query = $dbh->prepare($sql);
+            $query->execute();
+            $results = $query->fetchAll(PDO::FETCH_OBJ);
+            if ($query->rowCount() > 0) {
+                foreach ($results as $result) { ?>
+                    <li>
+                        <i class="bx bx-box"></i>
+                        <span class="links_name">
+                            <?php echo htmlentities($result->category_name); ?>
+                        </span>
+                    </li>
+                <?php }
+            } ?>
         </ul>
     </div>
 
@@ -31,58 +43,119 @@
     <div class="content">
         <!-- all Sites -->
         <div class="tab active">
+            <?php
+            // Fetch all categories
+            $sqlCategories = "SELECT * FROM categories WHERE category_name != 'Hidden Site';";
+            $queryCategories = $dbh->prepare($sqlCategories);
+            $queryCategories->execute();
+            $categories = $queryCategories->fetchAll(PDO::FETCH_OBJ);
 
-            <h2>
-                AI Site
-            </h2>
-            <div class="sites-container">
-                <div class="row">
-                    <div class="site" href="messenger.com">
-                        <img src="./images/123.png" alt="Site Icon">
-                        <p>
-                            site_name
-                        </p>
-                        <p>
-                            <span>
-                                site_company
-                            </span>
-                        </p>
-                    </div>
+            // Loop through each category
+            foreach ($categories as $category) { ?>
+                <h2>
+                    <?php echo htmlentities($category->category_name); ?>
+                </h2>
+                <div class="sites-container">
+                    <?php
+                    // Fetch sites belonging to the current category
+                    $categoryId = $category->category_id;
+                    $sqlSites = "SELECT sites.*
+                    FROM sites
+                    JOIN categories ON sites.category_id = categories.category_id
+                    WHERE sites.category_id = :category_id AND categories.category_name != 'Hidden Site';";
+                    $querySites = $dbh->prepare($sqlSites);
+                    $querySites->bindParam(':category_id', $categoryId, PDO::PARAM_INT);
+                    $querySites->execute();
+                    $sites = $querySites->fetchAll(PDO::FETCH_OBJ);
+
+                    // Display each site
+                    $siteCount = 0;
+                    foreach ($sites as $site) {
+                        // Check if it's the first site in a row
+                        if ($siteCount % 5 == 0) {
+                            echo '<div class="row">';
+                        } ?>
+                        <div class="site" href="<?php echo htmlentities($site->site_link); ?>">
+                            <img src="./images/<?php echo htmlentities($site->site_image); ?>" alt="Site Icon">
+                            <p>
+                                <?php echo htmlentities($site->site_name); ?>
+                            </p>
+                            <p>
+                                <span>
+                                    <?php echo htmlentities($site->site_company); ?>
+                                </span>
+                            </p>
+                        </div>
+                        <?php
+                        // Check if it's the last site in a row or the last site overall
+                        if (($siteCount + 1) % 5 == 0 || $siteCount == count($sites) - 1) {
+                            echo '</div>'; // Close the row div
+                        }
+                        $siteCount++;
+                    } ?>
                 </div>
-            </div>
+            <?php } ?>
         </div>
 
         <!-- devided by CategoryName -->
-        <div class="tab">
+        <?php
+        $sqlCategories = "SELECT DISTINCT category_name, category_id FROM categories";
+        $queryCategories = $dbh->prepare($sqlCategories);
+        $queryCategories->execute();
+        $categories = $queryCategories->fetchAll(PDO::FETCH_OBJ);
+        if ($queryCategories->rowCount() > 0) {
+            foreach ($categories as $category) {
+                ?>
+                <div class="tab <?php echo $category->category_name; ?>">
+                    <h2>
+                        <?php echo htmlentities($category->category_name); ?>
+                    </h2>
+                    <div class="sites-container"> <!-- Added container for sites -->
+                        <?php
+                        $categoryId = $category->category_id;
+                        $sqlSites = "SELECT * FROM sites WHERE category_id = :category_id";
+                        $querySites = $dbh->prepare($sqlSites);
+                        $querySites->bindParam(':category_id', $categoryId, PDO::PARAM_INT);
+                        $querySites->execute();
+                        $sites = $querySites->fetchAll(PDO::FETCH_OBJ);
+                        if ($querySites->rowCount() > 0) {
+                            $siteCount = 0; // Counter to determine the number of sites per row
+                            foreach ($sites as $site) {
+                                if ($siteCount % 5 == 0) { // Start a new row for every 5 sites
+                                    echo '<div class="row">';
+                                }
+                                ?>
 
-            <h2>
-                AI Site
-            </h2>
-            <div class="sites-container">
-                <div class="row">
-                    <div class="site" href="messenger.com">
-                        <img src="./images/123.png" alt="Site Icon">
-                        <p>
-                            site_name
-                        </p>
-                        <p>
-                            <span>
-                                site_company
-                            </span>
-                        </p>
+                                <div class="site" href="<?php echo htmlentities($site->site_link); ?>">
+                                    <img src="./images/<?php echo htmlentities($site->site_image); ?>" alt="Site Icon">
+                                    <p>
+                                        <?php echo htmlentities($site->site_name); ?>
+                                    </p>
+                                    <p>
+                                        <span>
+                                            <?php echo htmlentities($site->site_company); ?>
+                                        </span>
+                                    </p>
+                                </div>
+                                <?php
+                                $siteCount++;
+                                if ($siteCount % 5 == 0) { // Close the row after every 5 sites
+                                    echo '</div>';
+                                }
+                            }
+                            // Close the row if it's not filled with 5 sites
+                            if ($siteCount % 5 != 0) {
+                                echo '</div>';
+                            }
+                        } ?>
                     </div>
                 </div>
-            </div>
-        </div>
-
-    </div>
+            <?php }
+        } ?>
     </div>
 
     <!-- JavaScript for tab navigation -->
     <script>
-
-
-
         // Get all tab buttons
         var tabButtons = document.querySelectorAll('.nav-links li');
 
@@ -123,6 +196,11 @@
             });
         });
     </script>
+    <style>
+        img[alt="www.000webhost.com"] {
+            display: none;
+        }
+    </style>
 </body>
 
 </html>

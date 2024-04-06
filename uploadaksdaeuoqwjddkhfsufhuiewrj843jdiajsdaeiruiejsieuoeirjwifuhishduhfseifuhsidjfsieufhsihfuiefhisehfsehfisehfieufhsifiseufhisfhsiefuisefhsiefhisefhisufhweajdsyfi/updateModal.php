@@ -12,7 +12,6 @@
                     <p class="card-des">
                         <input name="site_id" placeholder="Site id" class="input-style input-width" type="text" hidden>
                         <input name="site_name" placeholder="Site Name" class="input-style input-width" type="text">
-                        <input name="site_company" placeholder="Company" class="input-style input-width" type="text">
                         <input name="site_link" placeholder="Link" class="input-style input-width" type="text">
                         <select name="categories" id="selectcategories" class="input-style ">
                             <?php

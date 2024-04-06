@@ -20,7 +20,7 @@ include ('../res/dbcon.php');
                 <span class="links_name">All Sites</span>
             </li>
             <?php
-            $sql = "SELECT DISTINCT category_name, category_id FROM categories";
+            $sql = "SELECT DISTINCT category_name, category_id FROM categories ORDER BY CASE WHEN category_name = 'Hidden Site' THEN 1 ELSE 0 END, category_name;";
             $query = $dbh->prepare($sql);
             $query->execute();
             $results = $query->fetchAll(PDO::FETCH_OBJ);
@@ -43,7 +43,9 @@ include ('../res/dbcon.php');
         <div class="tab active">
             <?php
             // Fetch all categories
-            $sqlCategories = "SELECT * FROM categories";
+            $sqlCategories = "SELECT *
+            FROM categories
+            ORDER BY CASE WHEN category_name = 'Hidden Site' THEN 1 ELSE 0 END, category_name;";
             $queryCategories = $dbh->prepare($sqlCategories);
             $queryCategories->execute();
             $categories = $queryCategories->fetchAll(PDO::FETCH_OBJ);
@@ -76,11 +78,7 @@ include ('../res/dbcon.php');
                             <p>
                                 <?php echo htmlentities($site->site_name); ?>
                             </p>
-                            <p>
-                                <span>
-                                    <?php echo htmlentities($site->site_company); ?>
-                                </span>
-                            </p>
+                            
                         </div>
                         <?php
                         // Check if it's the last site in a row or the last site overall
@@ -126,11 +124,6 @@ include ('../res/dbcon.php');
                                     <img src="../images/<?php echo htmlentities($site->site_image); ?>" alt="Site Icon">
                                     <p>
                                         <?php echo htmlentities($site->site_name); ?>
-                                    </p>
-                                    <p>
-                                        <span>
-                                            <?php echo htmlentities($site->site_company); ?>
-                                        </span>
                                     </p>
                                 </div>
                                 <?php
@@ -212,7 +205,6 @@ include ('../res/dbcon.php');
                             // Populate input fields with data
                             document.querySelector("#selectcategories").value = userData.category_id;
                             document.querySelector("input[name='site_name']").value = userData.site_name;
-                            document.querySelector("input[name='site_company']").value = userData.site_company;
                             document.querySelector("input[name='site_link']").value = userData.site_link;
                             document.querySelector("input[name='site_id']").value = userData.site_id;
 

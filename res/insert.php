@@ -17,12 +17,11 @@ if (isset($_POST['uploaddata'])) {
     $categoryId = $_POST['categories']; // Assuming 'categories' is the name of the select element
 
     // Construct and execute SQL query
-    $insertQuery = "INSERT INTO `sites`(`category_id`, `site_name`, `site_company`, `site_link`, `site_image`) 
+    $insertQuery = "INSERT INTO `sites`(`category_id`, `site_name`, `site_link`, `site_image`) 
                     VALUES (:category_id, :site_name, :site_company, :site_link, :site_image)";
     $stmt = $dbh->prepare($insertQuery);
     $stmt->bindParam(':category_id', $categoryId);
     $stmt->bindParam(':site_name', $siteName);
-    $stmt->bindParam(':site_company', $siteCompany);
     $stmt->bindParam(':site_link', $siteLink);
     $stmt->bindParam(':site_image', $newFileName);
 
@@ -47,27 +46,24 @@ if (isset($_POST['updatedata'])) {
     // Retrieve form data
     $siteid = $_POST['site_id'];
     $siteName = $_POST['site_name'];
-    $siteCompany = $_POST['site_company'];
     $siteLink = $_POST['site_link'];
     $categoryId = $_POST['categories']; // Assuming 'categories' is the name of the select element
 
     // Check if there is no file associated
     if (empty($_FILES["icon2"]["name"])) {
         // Construct and execute SQL query without updating image
-        $updateQuery = "UPDATE `sites` SET `category_id` = :category_id, `site_name` = :site_name, `site_company` = :site_company, `site_link` = :site_link WHERE `site_id` = :site_id";
+        $updateQuery = "UPDATE `sites` SET `category_id` = :category_id, `site_name` = :site_name, `site_link` = :site_link WHERE `site_id` = :site_id";
         $stmt = $dbh->prepare($updateQuery);
         $stmt->bindParam(':category_id', $categoryId);
         $stmt->bindParam(':site_name', $siteName);
-        $stmt->bindParam(':site_company', $siteCompany);
         $stmt->bindParam(':site_link', $siteLink);
         $stmt->bindParam(':site_id', $siteid);
     } else {
         // Construct and execute SQL query with updating image
-        $updateQuery = "UPDATE `sites` SET `category_id` = :category_id, `site_name` = :site_name, `site_company` = :site_company, `site_link` = :site_link, `site_image` = :site_image WHERE `site_id` = :site_id";
+        $updateQuery = "UPDATE `sites` SET `category_id` = :category_id, `site_name` = :site_name, `site_link` = :site_link, `site_image` = :site_image WHERE `site_id` = :site_id";
         $stmt = $dbh->prepare($updateQuery);
         $stmt->bindParam(':category_id', $categoryId);
         $stmt->bindParam(':site_name', $siteName);
-        $stmt->bindParam(':site_company', $siteCompany);
         $stmt->bindParam(':site_link', $siteLink);
         $stmt->bindParam(':site_image', $newFileName);
         $stmt->bindParam(':site_id', $siteid);
