@@ -103,11 +103,19 @@ body.modal-open {
 }
 
 .site img {
-  width: 60%;
+  width: 85px;
+  height: 85px;
+  object-fit: cover;
   margin-bottom: 10px;
 }
 
 .site p {
+  width: 100%;
+  text-align: center;
   color: #fff;
   font-size: 20px;
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }

@@ -50,7 +50,7 @@ include ('res/dbcon.php');
 
             <div class="tab" data-cat="<?php echo htmlentities($site->category_id); ?>">
                 <div class="site" href="<?php echo htmlentities($site->site_link); ?>">
-                    <img src="./images/<?php echo htmlentities($site->site_image); ?>" alt="Site Icon">
+                    <img src="./images/<?php echo htmlentities($site->site_image); ?>" alt="Site Icon" loading="lazy">
                     <p><?php echo htmlentities($site->site_name); ?></p>
                 </div>
             </div>

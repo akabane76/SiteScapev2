@@ -12,13 +12,12 @@ if (isset($_POST['uploaddata'])) {
 
     // Retrieve form data
     $siteName = $_POST['site_name'];
-    $siteCompany = $_POST['site_company'];
     $siteLink = $_POST['site_link'];
     $categoryId = $_POST['categories']; // Assuming 'categories' is the name of the select element
 
     // Construct and execute SQL query
     $insertQuery = "INSERT INTO `sites`(`category_id`, `site_name`, `site_link`, `site_image`) 
-                    VALUES (:category_id, :site_name, :site_company, :site_link, :site_image)";
+                    VALUES (:category_id, :site_name, :site_link, :site_image)";
     $stmt = $dbh->prepare($insertQuery);
     $stmt->bindParam(':category_id', $categoryId);
     $stmt->bindParam(':site_name', $siteName);
@@ -47,7 +46,7 @@ if (isset($_POST['updatedata'])) {
     $siteid = $_POST['site_id'];
     $siteName = $_POST['site_name'];
     $siteLink = $_POST['site_link'];
-    $categoryId = $_POST['categories']; // Assuming 'categories' is the name of the select element
+    $categoryId = $_POST['categories']; 
 
     // Check if there is no file associated
     if (empty($_FILES["icon2"]["name"])) {
