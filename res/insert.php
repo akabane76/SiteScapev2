@@ -1,4 +1,5 @@
 <?php
+ob_start();
 include 'dbcon.php';
 
 if (isset($_POST['uploaddata'])) {
@@ -46,7 +47,7 @@ if (isset($_POST['updatedata'])) {
     $siteid = $_POST['site_id'];
     $siteName = $_POST['site_name'];
     $siteLink = $_POST['site_link'];
-    $categoryId = $_POST['categories']; 
+    $categoryId = $_POST['categories'];
 
     // Check if there is no file associated
     if (empty($_FILES["icon2"]["name"])) {
@@ -79,6 +80,45 @@ if (isset($_POST['updatedata'])) {
     }
 }
 
+if (isset($_POST['catdata'])) {
+    $catName = $_POST['cat_name'];
 
+    // Construct and execute SQL query
+    $insertQuery = "INSERT INTO `categories`(`category_name`)
+        VALUES (:cat_name)";
+    $stmt = $dbh->prepare($insertQuery);
+    $stmt->bindParam(':cat_name', $catName);
+
+    try {
+        $stmt->execute();
+        echo "Data inserted successfully!";
+        header('location: ../uploadaksdaeuoqwjddkhfsufhuiewrj843jdiajsdaeiruiejsieuoeirjwifuhishduhfseifuhsidjfsieufhsihfuiefhisehfsehfisehfieufhsifiseufhisfhsiefuisefhsiefhisefhisufhweajdsyfi');
+    } catch (PDOException $e) {
+        echo "Error: " . $e->getMessage();
+    }
+}
+
+if (isset($_POST['updatecatdata'])) {
+    $catid = $_POST['upcat_id'];
+    $catName = $_POST['upcat_name'];
+
+    // Construct and execute SQL query
+    $insertQuery = "UPDATE `categories` SET `category_name`=:cat_name WHERE `category_id`=:cat_id";
+    $stmt = $dbh->prepare($insertQuery);
+    $stmt->bindParam(':cat_id', $catid);
+    $stmt->bindParam(':cat_name', $catName);
+
+    try {
+        $stmt->execute();
+        echo "Data updated successfully!";
+        header('location: ../uploadaksdaeuoqwjddkhfsufhuiewrj843jdiajsdaeiruiejsieuoeirjwifuhishduhfseifuhsidjfsieufhsihfuiefhisehfsehfisehfieufhsifiseufhisfhsiefuisefhsiefhisefhisufhweajdsyfi');
+        exit(); // Add exit after header to stop further execution
+    } catch (PDOException $e) {
+        echo "Error: " . $e->getMessage();
+    }
+}
+
+
+ob_end_flush();
 
 ?>

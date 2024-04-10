@@ -36,5 +36,6 @@ if (isset($_GET['site_id'])) {
     echo json_encode(array('error' => 'user_id parameter is missing.'));
 }
 
+
 $conn->close();
 ?>

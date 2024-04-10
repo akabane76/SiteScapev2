@@ -28,7 +28,7 @@ include ('../res/dbcon.php');
                 foreach ($results as $result) { ?>
                     <li>
                         <i class="bx bx-box"></i>
-                        <span class="links_name">
+                        <span class="links_name categoryList" catdata="<?php echo htmlentities($result->category_id); ?>">
                             <?php echo htmlentities($result->category_name); ?>
                         </span>
                     </li>
@@ -74,11 +74,11 @@ include ('../res/dbcon.php');
                         } ?>
                         <div class="site" href="<?php echo htmlentities($site->site_link); ?>"
                             data="<?php echo htmlentities($site->site_id); ?>">
-                            <img src="../images/<?php echo htmlentities($site->site_image); ?>" alt="Site Icon">
+                            <img src="../images/<?php echo htmlentities($site->site_image); ?>" alt="Site Icon" loading="lazy">
                             <p>
                                 <?php echo htmlentities($site->site_name); ?>
                             </p>
-                            
+
                         </div>
                         <?php
                         // Check if it's the last site in a row or the last site overall
@@ -93,7 +93,7 @@ include ('../res/dbcon.php');
 
         <!-- devided by CategoryName -->
         <?php
-        $sqlCategories = "SELECT DISTINCT category_name, category_id FROM categories";
+        $sqlCategories = "SELECT DISTINCT category_name, category_id FROM categories ORDER BY CASE WHEN category_name = 'Hidden Site' THEN 1 ELSE 0 END, category_name;";
         $queryCategories = $dbh->prepare($sqlCategories);
         $queryCategories->execute();
         $categories = $queryCategories->fetchAll(PDO::FETCH_OBJ);
@@ -121,7 +121,7 @@ include ('../res/dbcon.php');
                                 ?>
                                 <div class="site" href="<?php echo htmlentities($site->site_link); ?>"
                                     data="<?php echo htmlentities($site->site_id); ?>">
-                                    <img src="../images/<?php echo htmlentities($site->site_image); ?>" alt="Site Icon">
+                                    <img src="../images/<?php echo htmlentities($site->site_image); ?>" alt="Site Icon" loading="lazy">
                                     <p>
                                         <?php echo htmlentities($site->site_name); ?>
                                     </p>
@@ -162,8 +162,10 @@ include ('../res/dbcon.php');
         </button>
     </div>
 
-    <?php include 'updateModal.php'; ?>
-    <?php include 'insertModal.php'; ?>
+    <?php include './updatecatModal.php'; ?>
+    <?php include './catModal.php'; ?>
+    <?php include './updateModal.php'; ?>
+    <?php include './insertModal.php'; ?>
 
     <!-- JavaScript for tab navigation -->
     <script>
@@ -225,6 +227,53 @@ include ('../res/dbcon.php');
             });
         });
 
+
+        // Add click event listener to each .site element
+        var catElements = document.querySelectorAll('.categoryList');
+        catElements.forEach(function (categoryList) {
+            categoryList.addEventListener('click', function (event) {
+                // Prevent the default action of the click event
+                event.preventDefault();
+                // Get the href attribute of the clicked site
+
+                var updatecatModal = document.getElementById("updatecatModal");
+                var catdata = this.getAttribute('catdata');
+                // If the href is not null or empty, open it in a new tab
+                if (catdata && catdata.trim() !== '') {
+                    console.log("cat ID clicked:", catdata);
+
+                    // Send AJAX request
+                    var xhr = new XMLHttpRequest();
+                    xhr.open("GET", "../res/getcatData.php?cat_id=" + catdata, true);
+                    xhr.onreadystatechange = function () {
+                        if (xhr.readyState == 4 && xhr.status == 200) {
+                            var cat2Data = JSON.parse(xhr.responseText);
+                            console.log("Received data:", cat2Data);
+
+                            // Populate input fields with data
+                            document.querySelector("input[name='upcat_id']").value = cat2Data.category_id;
+                            document.querySelector("input[name='upcat_name']").value = cat2Data.category_name;
+
+                        }
+                    };
+                    xhr.send();
+
+                    // Show modal
+                    updatecatModal.style.display = "block";
+                }
+               
+            });
+        });
+
+
+        var catModal = document.getElementById("catModal");
+        var categorybtn = document.getElementById("categorybtn");
+
+        categorybtn.onclick = function () {
+            catModal.style.display = "block";
+            document.body.classList.add("modal-open");
+        }
+
         var uploadModal = document.getElementById("uploadModal");
         var uploadbtn = document.getElementById("uploadbtn");
         var uploadSpan = document.getElementsByClassName("close");
@@ -251,11 +300,21 @@ include ('../res/dbcon.php');
                 svg.style.display = 'block'
                 document.body.classList.remove("modal-open");
             }
+            if (event.target == catModal) {
+                catModal.style.display = "none";
+                document.body.classList.remove("modal-open");
+            }
+            if (event.target == updatecatModal) {
+                updatecatModal.style.display = "none";
+                document.body.classList.remove("modal-open");
+            }
         }
 
 
         // Get all tab buttons
         var tabButtons = document.querySelectorAll('.nav-links li');
+
+        var updatecatModal = document.getElementById("updatecatModal");
 
         // Get all tab contents
         var tabContents = document.querySelectorAll('.tab');
